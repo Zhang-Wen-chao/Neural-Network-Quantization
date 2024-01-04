@@ -20,6 +20,10 @@ https://pytorch.org/tutorials/prototype/fx_graph_mode_ptq_dynamic.html
 ## PYTORCH 2 EXPORT POST TRAINING QUANTIZATION
 卡在imagenet数据集了。正在下载。
 https://pytorch.org/tutorials/prototype/pt2e_quant_ptq.html
+
+## PYTORCH 2 EXPORT QUANTIZATION-AWARE TRAINING (QAT)
+卡在imagenet数据集了。正在下载。
+https://pytorch.org/tutorials/prototype/pt2e_quant_qat.html
 ## jupyter测试代理
 ```python
 import requests
