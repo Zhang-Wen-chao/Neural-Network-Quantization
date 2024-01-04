@@ -4,7 +4,9 @@
 
 下面这个博客写得挺详细。
 https://blog.csdn.net/zimiao552147572/article/details/105910915
-
+## Quantized Transfer Learning
+这个在colab可以非常顺畅地运行。
+https://pytorch.org/tutorials/intermediate/quantized_transfer_learning_tutorial.html
 ## jupyter测试代理
 ```python
 import requests
