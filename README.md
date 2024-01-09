@@ -6,9 +6,10 @@
 
 基本run成功了。保存序列化文件遇到了问题，发邮件给有同样问题的人了。
 ### [Dynamic Quantization on an LSTM Word Language Model](https://pytorch.org/tutorials/advanced/dynamic_quantization_tutorial.html)
-正在colab运行。
+在colab都运行不了。
 
-### [Quantized Transfer Learning](https://pytorch.org/tutorials/intermediate/quantized_transfer_learning_tutorial.html)
+wikitext-2数据集也不知道去哪里下载带有validation的txt格式。
+### [QUANTIZED TRANSFER LEARNING FOR COMPUTER VISION TUTORIAL](https://pytorch.org/tutorials/intermediate/quantized_transfer_learning_tutorial.html)
 这个在colab可以非常顺畅地运行。
 ### [FX GRAPH MODE POST TRAINING STATIC QUANTIZATION](https://pytorch.org/tutorials/prototype/fx_graph_mode_ptq_static.html)
 NameError: name 'qconfig_opt' is not defined
