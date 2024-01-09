@@ -43,3 +43,41 @@ except requests.exceptions.RequestException as e:
     print("Network connection is not working.")
 
 ```
+## 进度
+复现mmyolo_tensorrt
+https://www.bilibili.com/video/BV1Ds4y1k7yr/?vd_source=fb6ecc817428ba6260742f25efd17059
+
+这个视频看完了P1。
+## 记录一些想看的网页
+https://docs.nvidia.com/deeplearning/tensorrt/pytorch-quantization-toolkit/docs/index.html
+
+https://pytorch.org/blog/quantization-in-practice/#post-training-static-quantization-ptq
+
+https://github.com/NVIDIA/TensorRT/tree/master/tools/pytorch-quantization
+
+https://www.zhihu.com/question/411393222/answer/2359479242
+
+https://www.cvmart.net/community?keyword=%E9%87%8F%E5%8C%96
+
+https://mp.weixin.qq.com/mp/appmsgalbum?__biz=Mzg4ODA3MDkyMA==&action=getalbum&album_id=1648871870714200067&scene=173&from_msgid=2247483692&from_itemidx=1&count=3&nolastread=1#wechat_redirect
+
+https://zhuanlan.zhihu.com/c_1258047709686231040
+
+https://www.cnblogs.com/bigoldpan/p/16717472.html
+
+https://www.cnblogs.com/bigoldpan/p/16328630.html
+
+https://oldpan.me/archives/a-thought-of-oldpan
+
+https://www.cnblogs.com/bigoldpan/p/16717472.html
+
+https://oldpan.me/
+
+https://www.cnblogs.com/bigoldpan/p/16296035.html
+
+论文
+https://arxiv.org/abs/1712.05877?spm=ata.21736010.0.0.5d155919bwSdHC&file=1712.05877
+
+mmdeploy
+
+https://hanlab.mit.edu/songhan
