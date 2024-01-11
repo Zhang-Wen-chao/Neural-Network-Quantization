@@ -51,6 +51,11 @@ https://www.bilibili.com/video/BV1Ds4y1k7yr/?vd_source=fb6ecc817428ba6260742f25e
 ## 复现论文
 https://arxiv.org/abs/2204.06806
 
+
+https://arxiv.org/pdf/2206.00820.pdf
+
+https://github.com/ECoLab-POSTECH/NIPQ
+
 ## 记录一些想看的网页
 
 
