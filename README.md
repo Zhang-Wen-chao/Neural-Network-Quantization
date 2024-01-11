@@ -48,7 +48,12 @@ except requests.exceptions.RequestException as e:
 https://www.bilibili.com/video/BV1Ds4y1k7yr/?vd_source=fb6ecc817428ba6260742f25efd17059
 
 这个视频看完了P1。
+## 复现论文
+https://arxiv.org/abs/2204.06806
+
 ## 记录一些想看的网页
+
+
 https://docs.nvidia.com/deeplearning/tensorrt/pytorch-quantization-toolkit/docs/index.html
 
 https://pytorch.org/blog/quantization-in-practice/#post-training-static-quantization-ptq
