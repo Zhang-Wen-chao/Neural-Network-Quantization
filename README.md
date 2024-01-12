@@ -48,6 +48,23 @@ except requests.exceptions.RequestException as e:
 https://www.bilibili.com/video/BV1Ds4y1k7yr/?vd_source=fb6ecc817428ba6260742f25efd17059
 
 这个视频看完了P1。
+```bash
+sudo docker pull ubuntu:18.04
+
+sudo docker run -it -d \
+    --name mmyolo_tensorrt \
+    -v /dataset01:/dataset01 \
+    --network="host" \
+    --gpus all \
+    ubuntu:18.04
+
+sudo docker exec -it mmyolo_tensorrt /bin/bash
+
+# 然后配置了zsh, 上网端口
+export http_proxy="http://127.0.0.1:7890"
+export https_proxy="http://127.0.0.1:7890"
+```
+
 ## 复现论文
 https://arxiv.org/abs/2204.06806
 
