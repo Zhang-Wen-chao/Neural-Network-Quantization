@@ -28,21 +28,6 @@ NameError: name 'qconfig_opt' is not defined
 NameError: name 'qconfig_opt' is not defined
 
 运行不了：本教程描述了一个原型功能。 原型功能通常不作为 PyPI 或 Conda 等二进制发行版的一部分提供，除非有时在运行时标志后面，并且处于反馈和测试的早期阶段。
-## jupyter测试代理
-```python
-import requests
-
-proxies = {
-    "http": "http://127.0.0.1:7890",
-    "https": "http://127.0.0.1:7890",
-}
-try:
-    response = requests.get("https://www.google.com", proxies=proxies)
-    print("Network connection is working.")
-except requests.exceptions.RequestException as e: 
-    print("Network connection is not working.")
-
-```
 ## 进度
 复现mmyolo_tensorrt
 https://www.bilibili.com/video/BV1Ds4y1k7yr/?vd_source=fb6ecc817428ba6260742f25efd17059
@@ -64,18 +49,14 @@ sudo docker exec -it mmyolo_tensorrt /bin/bash
 export http_proxy="http://127.0.0.1:7890"
 export https_proxy="http://127.0.0.1:7890"
 ```
-
 ## 复现论文
 https://arxiv.org/abs/2204.06806
-
 
 https://arxiv.org/pdf/2206.00820.pdf
 
 https://github.com/ECoLab-POSTECH/NIPQ
 
 ## 记录一些想看的网页
-
-
 https://docs.nvidia.com/deeplearning/tensorrt/pytorch-quantization-toolkit/docs/index.html
 
 https://pytorch.org/blog/quantization-in-practice/#post-training-static-quantization-ptq
@@ -108,3 +89,20 @@ https://arxiv.org/abs/1712.05877?spm=ata.21736010.0.0.5d155919bwSdHC&file=1712.0
 mmdeploy
 
 https://hanlab.mit.edu/songhan
+
+## tips
+### jupyter测试代理
+```python
+import requests
+
+proxies = {
+    "http": "http://127.0.0.1:7890",
+    "https": "http://127.0.0.1:7890",
+}
+try:
+    response = requests.get("https://www.google.com", proxies=proxies)
+    print("Network connection is working.")
+except requests.exceptions.RequestException as e: 
+    print("Network connection is not working.")
+
+```
