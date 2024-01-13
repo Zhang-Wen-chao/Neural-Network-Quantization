@@ -32,7 +32,9 @@ NameError: name 'qconfig_opt' is not defined
 复现mmyolo_tensorrt
 https://www.bilibili.com/video/BV1Ds4y1k7yr/?vd_source=fb6ecc817428ba6260742f25efd17059
 
-这个视频看完了P1。
+这个视频看完了P3, 
+环境配置，基本上就差最后一步了，安装tensorrt，pycuda，numpy。
+现在正在下载tensorrt。然后是上传到服务器，解压缩，安装。
 ```bash
 sudo docker pull ubuntu:18.04
 
@@ -48,6 +50,37 @@ sudo docker exec -it mmyolo_tensorrt /bin/bash
 # 然后配置了zsh, 上网端口
 export http_proxy="http://127.0.0.1:7890"
 export https_proxy="http://127.0.0.1:7890"
+
+sudo docker exec -it mmyolo_tensorrt /bin/zsh
+
+sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 70
+sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 80
+
+sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7 70
+sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 80
+
+sudo update-alternatives --install /usr/bin/x86_64-linux-gnu-g++ x86_64-linux-gnu-g++ /usr/bin/x86_64-linux-gnu-g++-7 70
+sudo update-alternatives --install /usr/bin/x86_64-linux-gnu-g++ x86_64-linux-gnu-g++ /usr/bin/x86_64-linux-gnu-g++-8 80
+
+sudo update-alternatives --config gcc
+sudo update-alternatives --config g++
+sudo update-alternatives --config x86_64-linux-gnu-g++
+
+gcc --version
+g++ --version
+x86_64-linux-gnu-g++ --version
+
+wget https://developer.download.nvidia.com/compute/cuda/10.2/Prod/local_installers/cuda_10.2.89_440.33.01_linux.run
+sudo sh cuda_10.2.89_440.33.01_linux.run
+
+export PATH=/usr/local/cuda-10.2/bin:$PATH
+export LD_LIBRARY_PATH=/usr/local/cuda-10.2/lib64:$LD_LIBRARY_PATH
+
+apt install python3.8
+apt-get install python3.8-dev
+curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+python3.8 get-pip.py
+# then, follow the readme.md of mmyolo_tensorrt.
 ```
 ## 复现论文
 https://arxiv.org/abs/2204.06806
