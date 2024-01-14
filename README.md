@@ -33,8 +33,6 @@ NameError: name 'qconfig_opt' is not defined
 https://www.bilibili.com/video/BV1Ds4y1k7yr/?vd_source=fb6ecc817428ba6260742f25efd17059
 
 这个视频看完了P3, 
-环境配置，基本上就差最后一步了，安装tensorrt，pycuda，numpy。
-现在正在下载tensorrt。然后是上传到服务器，解压缩，安装。
 ```bash
 sudo docker pull ubuntu:18.04
 
@@ -53,18 +51,18 @@ export https_proxy="http://127.0.0.1:7890"
 
 sudo docker exec -it mmyolo_tensorrt /bin/zsh
 
-sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 70
-sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 80
+update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 70
+update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 80
 
-sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7 70
-sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 80
+update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7 70
+update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 80
 
-sudo update-alternatives --install /usr/bin/x86_64-linux-gnu-g++ x86_64-linux-gnu-g++ /usr/bin/x86_64-linux-gnu-g++-7 70
-sudo update-alternatives --install /usr/bin/x86_64-linux-gnu-g++ x86_64-linux-gnu-g++ /usr/bin/x86_64-linux-gnu-g++-8 80
+update-alternatives --install /usr/bin/x86_64-linux-gnu-g++ x86_64-linux-gnu-g++ /usr/bin/x86_64-linux-gnu-g++-7 70
+update-alternatives --install /usr/bin/x86_64-linux-gnu-g++ x86_64-linux-gnu-g++ /usr/bin/x86_64-linux-gnu-g++-8 80
 
-sudo update-alternatives --config gcc
-sudo update-alternatives --config g++
-sudo update-alternatives --config x86_64-linux-gnu-g++
+update-alternatives --config gcc
+update-alternatives --config g++
+update-alternatives --config x86_64-linux-gnu-g++
 
 gcc --version
 g++ --version
@@ -75,13 +73,79 @@ sudo sh cuda_10.2.89_440.33.01_linux.run
 
 export PATH=/usr/local/cuda-10.2/bin:$PATH
 export LD_LIBRARY_PATH=/usr/local/cuda-10.2/lib64:$LD_LIBRARY_PATH
+# 安装完CUDA记得安装CUDNN
 
 apt install python3.8
 apt-get install python3.8-dev
 curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
 python3.8 get-pip.py
 # then, follow the readme.md of mmyolo_tensorrt.
+
+export PYTHONPATH=/dataset01/zwc/mmyolo-hb/mmengine:$PYTHONPATH
+export PYTHONPATH=/dataset01/zwc/mmyolo-hb/mmcv:$PYTHONPATH
+export PYTHONPATH=/dataset01/zwc/mmyolo-hb/mmdetection:$PYTHONPATH
 ```
+### 1月14日
+才发现，20系显卡对应CUDA 10,30系对应CUDA 11。
+经验证，更换4090显卡后，基于cuda10.2编译的pytorch已不受支持；
+GeForce RTX 30系显卡支持CUDA 11.1及以上版本
+所以我使用CUDA10.2是不行的。
+
+我现在打算拉一个Ubuntu 22.04的docker，安装最新的CUDA12.1
+```bash
+docker pull ubuntu:22.04
+sudo docker run -it -d \
+    --name mmyolo_ubuntu22_cuda12 \
+    -v /dataset01:/dataset01 \
+    --network="host" \
+    --gpus all \
+    ubuntu:22.04
+
+sudo docker exec -it mmyolo_ubuntu22_cuda12 /bin/bash
+
+export http_proxy="http://127.0.0.1:7890"
+export https_proxy="http://127.0.0.1:7890"
+apt-get install git zsh wget
+sh -c "$(wget https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh -O -)"
+git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
+git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
+apt-get install autojump
+
+sudo docker exec -it mmyolo_ubuntu22_cuda12 /bin/zsh
+
+apt-get install gcc-10 g++-10
+update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 10
+update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-10 10
+update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-11 11
+update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-11 11
+update-alternatives --install /usr/bin/x86_64-linux-gnu-g++ x86_64-linux-gnu-g++ /usr/bin/g++-10 100
+update-alternatives --install /usr/bin/x86_64-linux-gnu-g++ x86_64-linux-gnu-g++ /usr/bin/g++-11 110
+add-apt-repository ppa:ubuntu-toolchain-r/test
+apt update
+apt install gcc-9 g++-9
+update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 9
+update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 9
+update-alternatives --install /usr/bin/x86_64-linux-gnu-g++ x86_64-linux-gnu-g++ /usr/bin/g++-9 90
+
+
+wget https://developer.download.nvidia.com/compute/cuda/12.1.0/local_installers/cuda_12.1.0_530.30.02_linux.run
+sudo sh cuda_12.1.0_530.30.02_linux.run
+
+export PATH=/usr/local/cuda-12.1/bin:$PATH
+export LD_LIBRARY_PATH=/usr/local/cuda-12.1/lib64:$LD_LIBRARY_PATH
+https://www.cnblogs.com/lycnight/p/17768264.html
+tar -xvf cudnn-linux-x86_64-8.9.6.50_cuda12-archive.tar.xz
+apt install python3.10
+apt install python3.10-dev
+apt-get install python3-pip
+
+MMCV_WITH_OPS=1 python3 setup.py develop
+# 失败，开始安装gcc9
+apt install ninja-build
+```
+### 1月15日
+必须搞清楚所有依赖，再开一个pip环境，或者conda环境，再降低CUDA到11的版本。
+
 ## 复现论文
 https://arxiv.org/abs/2204.06806
 
