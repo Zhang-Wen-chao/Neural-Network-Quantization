@@ -144,7 +144,27 @@ MMCV_WITH_OPS=1 python3 setup.py develop
 apt install ninja-build
 ```
 ### 1月15日
-必须搞清楚所有依赖，再开一个pip环境，或者conda环境，再降低CUDA到11的版本。
+我被这个tensorrt伤透了心。等有空了，还是直接拉nvidia：tensorrt的docker吧。从Ubuntu的dockers上构建的，明明按照官方支持版本安装了，但是还是出现各种小问题。
+
+[caskBuilderUtils.cpp::trtSmToCaskCCV::548] Error Code 1: Internal Error (Unsupported SM: 0x809)
+
+AttributeError: 'NoneType' object has no attribute 'create_execution_context'
+```bash
+python projects/easydeploy/tools/export.py \
+    configs/yolov5/yolov5_s-v61_fast_1xb12-40e_cat.py \
+    work_dirs/yolov5_s-v61_fast_1xb12-40e_cat/epoch_40.pth \
+    --work-dir work_dirs/yolov5_s-v61_fast_1xb12-40e_cat \
+    --img-size 640 640 \
+    --batch 1 \
+    --device cpu \
+    --simplify \
+    --opset 11 \
+    --backend 1 \
+    --pre-topk 1000 \
+    --keep-topk 100 \
+    --iou-threshold 0.65 \
+    --score-threshold 0.25
+```
 
 ## 复现论文
 https://arxiv.org/abs/2204.06806
