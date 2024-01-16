@@ -173,6 +173,7 @@ https://arxiv.org/pdf/2206.00820.pdf
 
 https://github.com/ECoLab-POSTECH/NIPQ
 
+https://zhuanlan.zhihu.com/p/651390746
 ## 记录一些想看的网页
 https://docs.nvidia.com/deeplearning/tensorrt/pytorch-quantization-toolkit/docs/index.html
 
