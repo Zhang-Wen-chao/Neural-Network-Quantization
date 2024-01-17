@@ -32,66 +32,12 @@ NameError: name 'qconfig_opt' is not defined
 复现mmyolo_tensorrt
 https://www.bilibili.com/video/BV1Ds4y1k7yr/?vd_source=fb6ecc817428ba6260742f25efd17059
 
-这个视频看完了P3, 
-```bash
-sudo docker pull ubuntu:18.04
-
-sudo docker run -it -d \
-    --name mmyolo_tensorrt \
-    -v /dataset01:/dataset01 \
-    --network="host" \
-    --gpus all \
-    ubuntu:18.04
-
-sudo docker exec -it mmyolo_tensorrt /bin/bash
-
-# 然后配置了zsh, 上网端口
-export http_proxy="http://127.0.0.1:7890"
-export https_proxy="http://127.0.0.1:7890"
-
-sudo docker exec -it mmyolo_tensorrt /bin/zsh
-
-update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 70
-update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 80
-
-update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7 70
-update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 80
-
-update-alternatives --install /usr/bin/x86_64-linux-gnu-g++ x86_64-linux-gnu-g++ /usr/bin/x86_64-linux-gnu-g++-7 70
-update-alternatives --install /usr/bin/x86_64-linux-gnu-g++ x86_64-linux-gnu-g++ /usr/bin/x86_64-linux-gnu-g++-8 80
-
-update-alternatives --config gcc
-update-alternatives --config g++
-update-alternatives --config x86_64-linux-gnu-g++
-
-gcc --version
-g++ --version
-x86_64-linux-gnu-g++ --version
-
-wget https://developer.download.nvidia.com/compute/cuda/10.2/Prod/local_installers/cuda_10.2.89_440.33.01_linux.run
-sudo sh cuda_10.2.89_440.33.01_linux.run
-
-export PATH=/usr/local/cuda-10.2/bin:$PATH
-export LD_LIBRARY_PATH=/usr/local/cuda-10.2/lib64:$LD_LIBRARY_PATH
-# 安装完CUDA记得安装CUDNN
-
-apt install python3.8
-apt-get install python3.8-dev
-curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
-python3.8 get-pip.py
-# then, follow the readme.md of mmyolo_tensorrt.
-
-export PYTHONPATH=/dataset01/zwc/mmyolo-hb/mmengine:$PYTHONPATH
-export PYTHONPATH=/dataset01/zwc/mmyolo-hb/mmcv:$PYTHONPATH
-export PYTHONPATH=/dataset01/zwc/mmyolo-hb/mmdetection:$PYTHONPATH
-```
+这个视频看完了P8,
 ### 1月14日
-才发现，20系显卡对应CUDA 10,30系对应CUDA 11。
+20系显卡对应CUDA 10,30系对应CUDA 11。
 经验证，更换4090显卡后，基于cuda10.2编译的pytorch已不受支持；
 GeForce RTX 30系显卡支持CUDA 11.1及以上版本
 所以我使用CUDA10.2是不行的。
-
-我现在打算拉一个Ubuntu 22.04的docker，安装最新的CUDA12.1
 ```bash
 docker pull ubuntu:22.04
 sudo docker run -it -d \
@@ -100,72 +46,45 @@ sudo docker run -it -d \
     --network="host" \
     --gpus all \
     ubuntu:22.04
-
 sudo docker exec -it mmyolo_ubuntu22_cuda12 /bin/bash
 
-export http_proxy="http://127.0.0.1:7890"
-export https_proxy="http://127.0.0.1:7890"
 apt-get install git zsh wget
 sh -c "$(wget https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh -O -)"
 git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
 git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
 apt-get install autojump
-
 sudo docker exec -it mmyolo_ubuntu22_cuda12 /bin/zsh
 
-apt-get install gcc-10 g++-10
-update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 10
-update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-10 10
-update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-11 11
-update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-11 11
-update-alternatives --install /usr/bin/x86_64-linux-gnu-g++ x86_64-linux-gnu-g++ /usr/bin/g++-10 100
-update-alternatives --install /usr/bin/x86_64-linux-gnu-g++ x86_64-linux-gnu-g++ /usr/bin/g++-11 110
-add-apt-repository ppa:ubuntu-toolchain-r/test
-apt update
 apt install gcc-9 g++-9
 update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 9
 update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 9
 update-alternatives --install /usr/bin/x86_64-linux-gnu-g++ x86_64-linux-gnu-g++ /usr/bin/g++-9 90
-
-
-wget https://developer.download.nvidia.com/compute/cuda/12.1.0/local_installers/cuda_12.1.0_530.30.02_linux.run
-sudo sh cuda_12.1.0_530.30.02_linux.run
-
-export PATH=/usr/local/cuda-12.1/bin:$PATH
-export LD_LIBRARY_PATH=/usr/local/cuda-12.1/lib64:$LD_LIBRARY_PATH
-https://www.cnblogs.com/lycnight/p/17768264.html
-tar -xvf cudnn-linux-x86_64-8.9.6.50_cuda12-archive.tar.xz
-apt install python3.10
-apt install python3.10-dev
-apt-get install python3-pip
-
-MMCV_WITH_OPS=1 python3 setup.py develop
-# 失败，开始安装gcc9
-apt install ninja-build
+update-alternatives --install /usr/bin/x86_64-linux-gnu-gcc x86_64-linux-gnu-gcc /usr/bin/gcc-9 90
 ```
 ### 1月15日
-我被这个tensorrt伤透了心。等有空了，还是直接拉nvidia：tensorrt的docker吧。从Ubuntu的dockers上构建的，明明按照官方支持版本安装了，但是还是出现各种小问题。
+我被这个tensorrt伤透了心。等有空了，还是直接拉tensorrt的docker吧。从Ubuntu的dockers上构建的，明明按照官方支持版本安装了，但是还是出现各种小问题。
 
 [caskBuilderUtils.cpp::trtSmToCaskCCV::548] Error Code 1: Internal Error (Unsupported SM: 0x809)
 
 AttributeError: 'NoneType' object has no attribute 'create_execution_context'
+### 1月17日
+安装成功了
 ```bash
-python projects/easydeploy/tools/export.py \
-    configs/yolov5/yolov5_s-v61_fast_1xb12-40e_cat.py \
-    work_dirs/yolov5_s-v61_fast_1xb12-40e_cat/epoch_40.pth \
-    --work-dir work_dirs/yolov5_s-v61_fast_1xb12-40e_cat \
-    --img-size 640 640 \
-    --batch 1 \
-    --device cpu \
-    --simplify \
-    --opset 11 \
-    --backend 1 \
-    --pre-topk 1000 \
-    --keep-topk 100 \
-    --iou-threshold 0.65 \
-    --score-threshold 0.25
-```
+docker pull nvcr.io/nvidia/tensorrt:22.12-py3
+sudo docker run -it -d \
+    --name mmyolo_trt8.5.1 \
+    -v /dataset01:/dataset01 \
+    --network="host" \
+    --gpus all \
+    nvcr.io/nvidia/tensorrt:22.12-py3
 
+sudo docker exec -it mmyolo_trt8.5.1 /bin/bash
+
+apt install ninja-build
+apt-get install libgl1-mesa-glx
+```
+### 1月18日
+模型精度的验证
 ## 复现论文
 https://arxiv.org/abs/2204.06806
 
@@ -207,7 +126,6 @@ https://arxiv.org/abs/1712.05877?spm=ata.21736010.0.0.5d155919bwSdHC&file=1712.0
 mmdeploy
 
 https://hanlab.mit.edu/songhan
-
 ## tips
 ### jupyter测试代理
 ```python
