@@ -30,9 +30,10 @@ NameError: name 'qconfig_opt' is not defined
 运行不了：本教程描述了一个原型功能。 原型功能通常不作为 PyPI 或 Conda 等二进制发行版的一部分提供，除非有时在运行时标志后面，并且处于反馈和测试的早期阶段。
 ## 进度
 复现mmyolo_tensorrt
-https://www.bilibili.com/video/BV1Ds4y1k7yr/?vd_source=fb6ecc817428ba6260742f25efd17059
 
-这个视频看完了P9,
+这个视频看完了P9
+### 1月22日
+为什么精度没有百分百对齐？这个还是得慢慢看，集中精力看，不能分心，分析过程挺长的。
 ### 1月14日
 20系显卡对应CUDA 10,30系对应CUDA 11。
 经验证，更换4090显卡后，基于cuda10.2编译的pytorch已不受支持；
@@ -83,8 +84,6 @@ sudo docker exec -it mmyolo_trt8.5.1 /bin/bash
 apt install ninja-build
 apt-get install libgl1-mesa-glx
 ```
-### 1月22日
-为什么精度没有百分百对齐？这个还是得慢慢看，集中精力看，不能分心，分析过程挺长的。
 ## 复现论文
 https://arxiv.org/abs/2204.06806
 
