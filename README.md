@@ -92,7 +92,17 @@ https://arxiv.org/pdf/2206.00820.pdf
 https://github.com/ECoLab-POSTECH/NIPQ
 
 https://zhuanlan.zhihu.com/p/651390746
+
+交大的powerinfer
+
+flexgen llm
+
+https://zhuanlan.zhihu.com/p/664164593
 ## 记录一些想看的网页
+cmu catalyst团队出了llm推理的综述，你可以简单介绍一下吗？
+大模型如何高效部署？CMU最新万字综述纵览LLM推理MLSys优化技术 - Hsword的文章 - 知乎
+https://zhuanlan.zhihu.com/p/677635306
+
 https://docs.nvidia.com/deeplearning/tensorrt/pytorch-quantization-toolkit/docs/index.html
 
 https://pytorch.org/blog/quantization-in-practice/#post-training-static-quantization-ptq
