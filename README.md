@@ -32,6 +32,10 @@ NameError: name 'qconfig_opt' is not defined
 复现mmyolo_tensorrt
 
 这个视频看完了P9
+
+开源的大模型量化，github上自己做一做。
+cpp开发岗位
+工程部署，再多搞一点
 ### 1月22日
 为什么精度没有百分百对齐？这个还是得慢慢看，集中精力看，不能分心，分析过程挺长的。
 ### 1月14日
@@ -102,6 +106,8 @@ https://zhuanlan.zhihu.com/p/664164593
 cmu catalyst团队出了llm推理的综述，你可以简单介绍一下吗？
 大模型如何高效部署？CMU最新万字综述纵览LLM推理MLSys优化技术 - Hsword的文章 - 知乎
 https://zhuanlan.zhihu.com/p/677635306
+
+https://www.zhihu.com/question/637480772
 
 https://docs.nvidia.com/deeplearning/tensorrt/pytorch-quantization-toolkit/docs/index.html
 
