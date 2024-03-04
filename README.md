@@ -90,6 +90,8 @@ sudo docker exec -it mmyolo_trt8.5.1 /bin/bash
 apt install ninja-build
 apt-get install libgl1-mesa-glx
 ```
+### 3月5日
+从头开始再看一遍，到了p?
 ## 复现论文
 https://arxiv.org/abs/2204.06806
 
