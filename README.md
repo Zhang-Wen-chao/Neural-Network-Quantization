@@ -29,51 +29,6 @@ NameError: name 'qconfig_opt' is not defined
 
 运行不了：本教程描述了一个原型功能。 原型功能通常不作为 PyPI 或 Conda 等二进制发行版的一部分提供，除非有时在运行时标志后面，并且处于反馈和测试的早期阶段。
 ## 进度
-复现mmyolo_tensorrt
-
-这个视频看完了P9
-
-开源的大模型量化，github上自己做一做。
-cpp开发岗位
-工程部署，再多搞一点
-
-可以在简历上写，熟悉什么量化算法，了解什么tensorrt的API接口，写过什么plugin，这样就有针对性了。
-### 1月22日
-为什么精度没有百分百对齐？这个还是得慢慢看，集中精力看，不能分心，分析过程挺长的。
-### 1月14日
-20系显卡对应CUDA 10,30系对应CUDA 11。
-经验证，更换4090显卡后，基于cuda10.2编译的pytorch已不受支持；
-GeForce RTX 30系显卡支持CUDA 11.1及以上版本
-所以我使用CUDA10.2是不行的。
-```bash
-docker pull ubuntu:22.04
-sudo docker run -it -d \
-    --name mmyolo_ubuntu22_cuda12 \
-    -v /dataset01:/dataset01 \
-    --network="host" \
-    --gpus all \
-    ubuntu:22.04
-sudo docker exec -it mmyolo_ubuntu22_cuda12 /bin/bash
-
-apt-get install git zsh wget
-sh -c "$(wget https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh -O -)"
-git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
-git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
-apt-get install autojump
-sudo docker exec -it mmyolo_ubuntu22_cuda12 /bin/zsh
-
-apt install gcc-9 g++-9
-update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 9
-update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 9
-update-alternatives --install /usr/bin/x86_64-linux-gnu-g++ x86_64-linux-gnu-g++ /usr/bin/g++-9 90
-update-alternatives --install /usr/bin/x86_64-linux-gnu-gcc x86_64-linux-gnu-gcc /usr/bin/gcc-9 90
-```
-### 1月15日
-我被这个tensorrt伤透了心。等有空了，还是直接拉tensorrt的docker吧。从Ubuntu的dockers上构建的，明明按照官方支持版本安装了，但是还是出现各种小问题。
-
-[caskBuilderUtils.cpp::trtSmToCaskCCV::548] Error Code 1: Internal Error (Unsupported SM: 0x809)
-
-AttributeError: 'NoneType' object has no attribute 'create_execution_context'
 ### 1月17日
 安装成功了
 ```bash
@@ -90,8 +45,15 @@ sudo docker exec -it mmyolo_trt8.5.1 /bin/bash
 apt install ninja-build
 apt-get install libgl1-mesa-glx
 ```
-### 3月5日
-从头开始再看一遍，到了p?
+### 3月6日
+#### p4 mmyolo初体验
+```bash
+sudo docker exec -it mmyolo_trt8.5.1 /bin/zsh
+cd /dataset01/zwc/mmyolo-hb/mmyolo
+python tools/train.py configs/yolov5/yolov5_s-v61_fast_1xb12-40e_cat.py
+```
+
+
 ## 复现论文
 https://arxiv.org/abs/2204.06806
 
