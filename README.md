@@ -28,9 +28,8 @@ NameError: name 'qconfig_opt' is not defined
 NameError: name 'qconfig_opt' is not defined
 
 运行不了：本教程描述了一个原型功能。 原型功能通常不作为 PyPI 或 Conda 等二进制发行版的一部分提供，除非有时在运行时标志后面，并且处于反馈和测试的早期阶段。
-## 进度
-### 1月17日
-安装成功了
+# 毕设进度
+## 环境安装成功
 ```bash
 docker pull nvcr.io/nvidia/tensorrt:22.12-py3
 sudo docker run -it -d \
@@ -45,16 +44,307 @@ sudo docker exec -it mmyolo_trt8.5.1 /bin/bash
 apt install ninja-build
 apt-get install libgl1-mesa-glx
 ```
-### 3月6日
-#### p4 mmyolo初体验
+## p4 mmyolo初体验
+### 训练
 ```bash
 sudo docker exec -it mmyolo_trt8.5.1 /bin/zsh
 cd /dataset01/zwc/mmyolo-hb/mmyolo
 python tools/train.py configs/yolov5/yolov5_s-v61_fast_1xb12-40e_cat.py
 ```
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.745
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.942
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.876
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = -1.000
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = -1.000
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.745
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.697
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.797
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.813
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = -1.000
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = -1.000
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.813
+03/06 14:13:12 - mmengine - INFO - bbox_mAP_copypaste: 0.745 0.942 0.876 -1.000 -1.000 0.745
+03/06 14:13:12 - mmengine - INFO - Epoch(val) [40][28/28]    coco/bbox_mAP: 0.7450  coco/bbox_mAP_50: 0.9420  coco/bbox_mAP_75: 0.8760  coco/bbox_mAP_s: -1.0000  coco/bbox_mAP_m: -1.0000  coco/bbox_mAP_l: 0.7450  data_time: 0.0873  time: 0.1076
+03/06 14:13:12 - mmengine - INFO - The previous best checkpoint /dataset01/zwc/mmyolo-hb/mmyolo/work_dirs/yolov5_s-v61_fast_1xb12-40e_cat/best_coco_bbox_mAP_epoch_30.pth is removed
+03/06 14:13:15 - mmengine - INFO - The best checkpoint with 0.7450 coco/bbox_mAP at 40 epoch is saved to best_coco_bbox_mAP_epoch_40.pth.
+### 导出onnx
+```bash
+python projects/easydeploy/tools/export.py \
+    configs/yolov5/yolov5_s-v61_fast_1xb12-40e_cat.py \
+    work_dirs/yolov5_s-v61_fast_1xb12-40e_cat/epoch_40.pth \
+    --work-dir work_dirs/yolov5_s-v61_fast_1xb12-40e_cat \
+    --img-size 640 640 \
+    --batch 1 \
+    --device cpu \
+    --simplify \
+    --opset 11 \
+    --backend 1 \
+    --pre-topk 1000 \
+    --keep-topk 100 \
+    --iou-threshold 0.65 \
+    --score-threshold 0.25
+```
+ONNX export success, save into work_dirs/yolov5_s-v61_fast_1xb12-40e_cat/end2end.onnx
+### onnx用cpu推理
+```bash
+python projects/easydeploy/tools/image-demo.py \
+    data/cat/images/IMG_20210728_205117.jpg \
+    configs/yolov5/yolov5_s-v61_fast_1xb12-40e_cat.py \
+    work_dirs/yolov5_s-v61_fast_1xb12-40e_cat/end2end.onnx \
+    --device cpu
+# 推理结果在下面目录：
+/dataset01/zwc/mmyolo-hb/mmyolo/output/IMG_20210728_205117.jpg
+```
+### 导出 tensorrt8 部署需要的onnx
+```bash
+python projects/easydeploy/tools/export.py \
+    configs/yolov5/yolov5_s-v61_fast_1xb12-40e_cat.py \
+    work_dirs/yolov5_s-v61_fast_1xb12-40e_cat/epoch_40.pth \
+    --work-dir work_dirs/yolov5_s-v61_fast_1xb12-40e_cat \
+    --img-size 640 640 \
+    --batch 1 \
+    --device cuda:0 \
+    --simplify \
+    --opset 11 \
+    --backend 2 \
+    --pre-topk 1000 \
+    --keep-topk 100 \
+    --iou-threshold 0.65 \
+    --score-threshold 0.25
+```
+ONNX export success, save into work_dirs/yolov5_s-v61_fast_1xb12-40e_cat/end2end.onnx
+### 用英伟达显卡生成序列化文件
+```bash
+python projects/easydeploy/tools/build_engine.py \
+    work_dirs/yolov5_s-v61_fast_1xb12-40e_cat/end2end.onnx \
+    --img-size 640 640 \
+    --device cuda:0
+```
+Save in /dataset01/zwc/mmyolo-hb/mmyolo/work_dirs/yolov5_s-v61_fast_1xb12-40e_cat/end2end.engine
+### 用英伟达显卡进行图片推理
+```bash
+python projects/easydeploy/tools/image-demo.py \
+    data/cat/images/IMG_20210728_205312.jpg \
+    configs/yolov5/yolov5_s-v61_fast_1xb12-40e_cat.py \
+    work_dirs/yolov5_s-v61_fast_1xb12-40e_cat/end2end.engine \
+    --device cuda:0
+# 推理结果在下面目录：
+/dataset01/zwc/mmyolo-hb/mmyolo/output/IMG_20210728_205312.jpg
+```
+## 导出mmyolo系列模型,onnx tensorrt版本
+### yolov5
+就还是用mmyolo初体验中，猫检测器的转换命令
+```bash
+python projects/easydeploy/tools/export.py \
+	configs/yolov5/yolov5_s-v61_fast_1xb12-40e_cat.py \
+	work_dirs/yolov5_s-v61_fast_1xb12-40e_cat/epoch_40.pth \
+	--work-dir work_dirs/yolov5_s-v61_fast_1xb12-40e_cat \
+    --img-size 640 640 \
+    --batch 1 \
+    --device cpu \
+    --simplify \
+	--opset 11 \
+	--backend 2 \
+	--pre-topk 1000 \
+	--keep-topk 100 \
+	--iou-threshold 0.65 \
+	--score-threshold 0.25
+```
+### yolov6
+```bash
+pip install openmim==0.3.7
+workdir="yolov6_n_syncbn_fast_8xb32-400e_coco"
+mim download mmyolo --config $workdir --dest ./work_dirs/$workdir
+pth_path=`ls ./work_dirs/$workdir/*.pth`
+
+python projects/easydeploy/tools/export.py \
+	work_dirs/$workdir/$workdir.py \
+	${pth_path} \
+	--work-dir work_dirs/$workdir \
+    --img-size 640 640 \
+    --batch 1 \
+    --device cpu \
+    --simplify \
+	--opset 11 \
+	--backend 2 \
+	--pre-topk 30000 \
+	--keep-topk 300 \
+	--iou-threshold 0.65 \
+	--score-threshold 0.001
+
+netron work_dirs/yolov6_n_syncbn_fast_8xb32-400e_coco/end2end.onnx
+ssh -L 8080:localhost:8080 student001@10.20.30.160
+# backend 2 是trt8, backend 3 是trt7;
+# yolov6 用trt8, 检测头是EfficientNMS_TRT; 用 trt7 是BatchedNMSDynamic_TRT;
+```
+### yolov7
+```bash
+workdir="yolov7_tiny_syncbn_fast_8x16b-300e_coco"
+mim download mmyolo --config $workdir --dest ./work_dirs/$workdir
+
+pth_path=`ls ./work_dirs/$workdir/*.pth`
+
+python projects/easydeploy/tools/export.py \
+	work_dirs/$workdir/$workdir.py \
+	${pth_path} \
+	--work-dir work_dirs/$workdir \
+    --img-size 640 640 \
+    --batch 1 \
+    --device cpu \
+    --simplify \
+	--opset 11 \
+	--backend 2 \
+	--pre-topk 1000 \
+	--keep-topk 100 \
+	--iou-threshold 0.65 \
+	--score-threshold 0.25
+```
+### yolov8
+```bash
+workdir="yolov8_n_syncbn_fast_8xb16-500e_coco"
+mim download mmyolo --config $workdir --dest ./work_dirs/$workdir
+
+pth_path=`ls ./work_dirs/$workdir/*.pth`
+
+python projects/easydeploy/tools/export.py \
+	work_dirs/$workdir/$workdir.py \
+	${pth_path} \
+	--work-dir work_dirs/$workdir \
+    --img-size 640 640 \
+    --batch 1 \
+    --device cpu \
+    --simplify \
+	--opset 11 \
+	--backend 2 \
+	--pre-topk 1000 \
+	--keep-topk 100 \
+	--iou-threshold 0.65 \
+	--score-threshold 0.25
+```
+### yolovx
+```bash
+workdir="yolox_tiny_fast_8xb8-300e_coco"
+mim download mmyolo --config $workdir --dest ./work_dirs/$workdir
+
+pth_path=`ls ./work_dirs/$workdir/*.pth`
+python projects/easydeploy/tools/export.py \
+	work_dirs/$workdir/$workdir.py \
+	${pth_path} \
+	--work-dir work_dirs/$workdir \
+    --img-size 640 640 \
+    --batch 1 \
+    --device cpu \
+    --simplify \
+	--opset 11 \
+	--backend 3 \
+	--pre-topk 1000 \
+	--keep-topk 100 \
+	--iou-threshold 0.65 \
+	--score-threshold 0.25
+```
+### ppyoloe_plus
+```bash
+workdir="ppyoloe_plus_s_fast_8xb8-80e_coco"
+mim download mmyolo --config $workdir --dest ./work_dirs/$workdir
+
+pth_path=`ls ./work_dirs/$workdir/*.pth`
+python projects/easydeploy/tools/export.py \
+	work_dirs/$workdir/$workdir.py \
+	${pth_path} \
+	--work-dir work_dirs/$workdir \
+    --img-size 640 640 \
+    --batch 1 \
+    --device cpu \
+    --simplify \
+	--opset 11 \
+	--backend 2 \
+	--pre-topk 1000 \
+	--keep-topk 100 \
+	--iou-threshold 0.65 \
+	--score-threshold 0.25
+```
+### rtmdet
+```bash
+workdir="rtmdet_tiny_syncbn_fast_8xb32-300e_coco"
+mim download mmyolo --config $workdir --dest ./work_dirs/$workdir
+
+pth_path=`ls ./work_dirs/$workdir/*.pth`
+python projects/easydeploy/tools/export.py \
+	work_dirs/$workdir/$workdir.py \
+	${pth_path} \
+	--work-dir work_dirs/$workdir \
+    --img-size 640 640 \
+    --batch 1 \
+    --device cpu \
+    --simplify \
+	--opset 11 \
+	--backend 2 \
+	--pre-topk 1000 \
+	--keep-topk 100 \
+	--iou-threshold 0.65 \
+	--score-threshold 0.25
+```
+### rtmdet 旋转框
+```bash
+workdir="rtmdet-r_tiny_fast_1xb8-36e_dota"
+mim download mmyolo --config $workdir --dest ./work_dirs/$workdir
 
 
-## 复现论文
+pth_path=`ls ./work_dirs/$workdir/*.pth`
+python projects/easydeploy/tools/export.py \
+	work_dirs/$workdir/$workdir.py \
+	${pth_path} \
+	--work-dir work_dirs/$workdir \
+    --img-size 640 640 \
+    --batch 1 \
+    --device cpu \
+    --simplify \
+	--opset 11 \
+	--backend 2 \
+	--pre-topk 1000 \
+	--keep-topk 100 \
+	--iou-threshold 0.65 \
+	--score-threshold 0.25
+```
+这个导出有问题。
+## 初步导出Tensorrt
+```bash
+workdir="yolov6_n_syncbn_fast_8xb32-400e_coco"
+mim download mmyolo --config $workdir --dest ./work_dirs/$workdir
+
+pth_path=`ls ./work_dirs/$workdir/*.pth`
+
+config_file="work_dirs/$workdir/$workdir.py"
+
+python projects/easydeploy/tools/export.py \
+	$config_file \
+	${pth_path} \
+	--work-dir work_dirs/$workdir \
+    --img-size 640 640 \
+    --batch 1 \
+    --device cpu \
+    --simplify \
+	--opset 11 \
+	--backend 2 \
+	--pre-topk 1000 \
+	--keep-topk 300 \
+	--iou-threshold 0.65 \
+	--score-threshold 0.3
+
+python projects/easydeploy/tools/build_engine.py \
+     ./work_dirs/$workdir/end2end.onnx \
+    --img-size 640 640 \
+    --device cuda:0
+
+python projects/easydeploy/tools/image-demo.py \
+    demo/dog.jpg \
+    $config_file \
+    ./work_dirs/$workdir/end2end.engine \
+    --device cuda:0
+```
+## TensorRT模型精度的验证
+
+# 复现论文
 https://arxiv.org/abs/2204.06806
 
 https://arxiv.org/pdf/2206.00820.pdf
@@ -107,8 +397,8 @@ https://arxiv.org/abs/1712.05877?spm=ata.21736010.0.0.5d155919bwSdHC&file=1712.0
 mmdeploy
 
 https://hanlab.mit.edu/songhan
-## tips
-### jupyter测试代理
+# tips
+## jupyter测试代理
 ```python
 import requests
 
