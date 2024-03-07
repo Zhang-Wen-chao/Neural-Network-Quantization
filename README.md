@@ -343,6 +343,38 @@ python projects/easydeploy/tools/image-demo.py \
     --device cuda:0
 ```
 ## TensorRT模型精度的验证
+```bash
+workdir="yolov6_n_syncbn_fast_8xb32-400e_coco"
+mim download mmyolo --config $workdir --dest ./work_dirs/$workdir
+
+pth_path=`ls ./work_dirs/$workdir/*.pth`
+
+config_file="work_dirs/$workdir/$workdir.py"
+
+python projects/easydeploy/tools/export.py \
+	$config_file \
+	${pth_path} \
+	--work-dir work_dirs/$workdir \
+    --img-size 640 640 \
+    --batch 1 \
+    --device cpu \
+    --simplify \
+	--opset 11 \
+	--backend 2 \
+	--pre-topk 30000 \
+	--keep-topk 300 \
+	--iou-threshold 0.65 \
+	--score-threshold 0.001
+
+python projects/easydeploy/tools/build_engine.py \
+     ./work_dirs/$workdir/end2end.onnx \
+    --img-size 640 640 \
+    --device cuda:0
+```
+目标：
+1. 探索相同输入下tensorrt和pytorch两个框架的输出有无不同
+2. 针对 coco-val 数据集下的精度，tensorrt和pytorch得到的有何区别？
+
 
 # 复现论文
 https://arxiv.org/abs/2204.06806
