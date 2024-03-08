@@ -370,11 +370,89 @@ python projects/easydeploy/tools/build_engine.py \
      ./work_dirs/$workdir/end2end.onnx \
     --img-size 640 640 \
     --device cuda:0
+
+python self_study_scripts/01cmp_output_with_torch_tensorrt.py \
+    demo/dog.jpg \
+    $config_file \
+    ./work_dirs/$workdir/end2end.engine \
+    $pth_path \
+    --device cuda:0
+
+python self_study_scripts/01cmp_output_with_torch_tensorrt.py \
+    /dataset01/coco2017/val2017/ \
+    $config_file \
+    ./work_dirs/$workdir/end2end.engine \
+    $pth_path \
+    --device cuda:0 \
+	--result-json-path /dataset01/zwc/mmyolo-hb/mmyolo/self_study_scripts/tensort-1.json
+这个命令需要很久，要推理5000个呢。
 ```
 目标：
 1. 探索相同输入下tensorrt和pytorch两个框架的输出有无不同
 2. 针对 coco-val 数据集下的精度，tensorrt和pytorch得到的有何区别？
 
+得到yolov6 pytorch版本输出
+
+```bash
+# 测试精度， 为加快速度还请去掉'/dataset01/zwc/mmyolo-hb/mmyolo/work_dirs/yolov6_n_syncbn_fast_8xb32-400e_coco/yolov6_n_syncbn_fast_8xb32-400e_coco.py'文件中的 visualization hook
+# visualization=dict(type='mmdet.DetVisualizationHook')
+workdir="yolov6_n_syncbn_fast_8xb32-400e_coco"
+pth_path=`ls ./work_dirs/$workdir/*.pth`
+python tools/test.py work_dirs/$workdir/$workdir.py \
+                     $pth_path \
+					 --json-prefix ./self_study_scripts/yolov6_n_coco_result
+
+python ./self_study_scripts/02evel_trt_json_output.py
+```
+第一个是pytorch，第二个是tensorrt.
+loading annotations into memory...
+Done (t=0.50s)
+creating index...
+index created!
+number of coco_classes: 80
+Loading and preparing results...
+DONE (t=12.20s)
+creating index...
+index created!
+Running per image evaluation...
+Evaluate annotation type *bbox*
+DONE (t=106.48s).
+Accumulating evaluation results...
+DONE (t=26.75s).
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.362
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.516
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.392
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.166
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.401
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.521
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.312
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.522
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.574
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.340
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.644
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.773
+Loading and preparing results...
+DONE (t=5.28s)
+creating index...
+index created!
+Running per image evaluation...
+Evaluate annotation type *bbox*
+DONE (t=107.03s).
+Accumulating evaluation results...
+DONE (t=26.48s).
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.361
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.516
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.389
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.167
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.399
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.519
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.311
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.521
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.573
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.338
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.642
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.771
+## 精度没有百分之百对齐的原因
 
 # 复现论文
 https://arxiv.org/abs/2204.06806
