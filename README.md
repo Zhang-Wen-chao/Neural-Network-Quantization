@@ -29,6 +29,19 @@ NameError: name 'qconfig_opt' is not defined
 
 运行不了：本教程描述了一个原型功能。 原型功能通常不作为 PyPI 或 Conda 等二进制发行版的一部分提供，除非有时在运行时标志后面，并且处于反馈和测试的早期阶段。
 # 毕设进度
+跟着追乐大兵的视频，看了好久。这个系列的视频，重在分析量化方法。不在实现某个算法。
+
+我感觉我好像搞错了重点，我的毕设名字很好啊，管它什么呢，我先部署了再说。哪有什么提升标准。现在不应该使劲研究追乐大兵的视频了。
+
+现在应该把重点放在王鑫宇的仓库上啊，部署成功一个，就开始写这一部分的论文。
+## 王鑫宇仓库
+首先拉最新的仓库，然后查看所有yolo系列支持的tensorrt版本，固定一下各种软件的版本。
+tensorrt8比较多的话，就都用8,不然都不像是2024年的论文。
+
+什么叫优化？一个命令行部署的精度，比我用API仔细调整的精度，低，那我不就是API调用小能手了。
+### yolov3
+
+# 追乐大兵的b站视频
 ## 环境安装成功
 ```bash
 docker pull nvcr.io/nvidia/tensorrt:22.12-py3
@@ -453,7 +466,10 @@ DONE (t=26.48s).
  Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.642
  Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.771
 ## 精度没有百分之百对齐的原因
-
+```bash
+python demo/image_demo.py demo/dog.jpg ./work_dirs/yolov6_n_syncbn_fast_8xb32-400e_coco/yolov6_n_syncbn_fast_8xb32-400e_coco.py ./work_dirs/yolov6_n_syncbn_fast_8xb32-400e_coco/yolov6_n_syncbn_fast_8xb32-400e_coco_20221030_202726-d99b2e82.pth
+```
+出现了版本差异导致的问题，后面的操作都跟不上了。这种分析也并不必写在论文里面。
 # 复现论文
 https://arxiv.org/abs/2204.06806
 
