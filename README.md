@@ -81,9 +81,11 @@ tensorrt8比较多的话，就都用8,不然都不像是2024年的论文。
 ### yolov3
 ### yolov4
 ### yolov5
-还没开始clone -b。没明白-b的含义，去查一下。
+(base) /dataset01/zwc/tensorrtx/yolov5/tensorrtx/yolov5/build (yolov5-v7.0 ✘)✹ ᐅ ./yolov5_det -d yolov5s_det.engine ../images     
+inference time: 122ms
+inference time: 0ms
 
-针对这个，哪怕是自己写一个benchmark呢。
+针对这个，怎么对比map呢？哪怕是自己写一个benchmark呢。
 ### yolov6
 王鑫宇没有yolov6，追乐有啊！！没有功夫是白费的。而且追乐详细优化了yolov6，但就是没有他那么老的显卡配tensorrt了。
 
