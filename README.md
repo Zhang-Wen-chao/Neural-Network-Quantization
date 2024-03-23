@@ -87,7 +87,6 @@ inference time: 0ms
 
 现在的问题，yolov5s，部署到tensorrt上后，怎么生成result.json文件呢？
 
-
 mAPval values are for single-model single-scale on COCO val2017 dataset.
 #### yolov5s
 (base) /dataset01/zwc/tensorrtx/yolov5/yolov5 (v7.0 ✘)✭ ᐅ python val.py --save-json --data /dataset01/zwc/tensorrtx/yolov5/yolov5/data/coco.yaml   
