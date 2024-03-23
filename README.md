@@ -85,7 +85,50 @@ tensorrt8比较多的话，就都用8,不然都不像是2024年的论文。
 inference time: 122ms
 inference time: 0ms
 
-针对这个，怎么对比map呢？哪怕是自己写一个benchmark呢。
+现在的问题，yolov5s，部署到tensorrt上后，怎么生成result.json文件呢？
+
+
+mAPval values are for single-model single-scale on COCO val2017 dataset.
+#### yolov5s
+(base) /dataset01/zwc/tensorrtx/yolov5/yolov5 (v7.0 ✘)✭ ᐅ python val.py --save-json --data /dataset01/zwc/tensorrtx/yolov5/yolov5/data/coco.yaml   
+val: data=/dataset01/zwc/tensorrtx/yolov5/yolov5/data/coco.yaml, weights=yolov5s.pt, batch_size=32, imgsz=640, conf_thres=0.001, iou_thres=0.6, max_det=300, task=val, device=, workers=8, single_cls=False, augment=False, verbose=False, save_txt=False, save_hybrid=False, save_conf=False, save_json=True, project=runs/val, name=exp, exist_ok=False, half=False, dnn=False
+YOLOv5 🚀 v7.0-0-g915bbf29 Python-3.9.13 torch-2.1.2+cu121 CUDA:0 (NVIDIA GeForce RTX 4090, 24217MiB)
+
+Fusing layers... 
+YOLOv5s summary: 213 layers, 7225885 parameters, 0 gradients, 16.4 GFLOPs
+val: Scanning /dataset01/zwc/tensorrtx/yolov5/datasets/coco/val2017... 4952 images, 48 backgrounds, 0 corrupt: 100%|██████████| 5000/5000 00:00
+val: New cache created: /dataset01/zwc/tensorrtx/yolov5/datasets/coco/val2017.cache
+                 Class     Images  Instances          P          R      mAP50   mAP50-95: 100%|██████████| 157/157 00:38
+                   all       5000      36335       0.67       0.52      0.565      0.371
+Speed: 0.1ms pre-process, 1.0ms inference, 1.2ms NMS per image at shape (32, 3, 640, 640)
+
+Evaluating pycocotools mAP... saving runs/val/exp8/yolov5s_predictions.json...
+loading annotations into memory...
+Done (t=0.39s)
+creating index...
+index created!
+Loading and preparing results...
+DONE (t=4.81s)
+creating index...
+index created!
+Running per image evaluation...
+Evaluate annotation type *bbox*
+DONE (t=53.68s).
+Accumulating evaluation results...
+DONE (t=11.77s).
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.374
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.571
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.402
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.211
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.423
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.490
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.311
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.516
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.566
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.378
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.625
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.723
+Results saved to runs/val/exp8
 ### yolov6
 王鑫宇没有yolov6，追乐有啊！！没有功夫是白费的。而且追乐详细优化了yolov6，但就是没有他那么老的显卡配tensorrt了。
 
@@ -497,6 +540,7 @@ DONE (t=26.75s).
  Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.340
  Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.644
  Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.773
+
 Loading and preparing results...
 DONE (t=5.28s)
 creating index...
