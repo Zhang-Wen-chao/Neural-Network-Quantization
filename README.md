@@ -70,6 +70,8 @@ GPU/CPU使用率：在推理过程中GPU和CPU的使用情况，可以通过专�
 ## 王鑫宇仓库
 首先拉最新的仓库，然后查看所有yolo系列支持的tensorrt版本，固定一下各种软件的版本。
 tensorrt8比较多的话，就都用8,不然都不像是2024年的论文。
+
+数据集：/dataset01/zwc/tensorrtx/yolov5/datasets/coco/
 ### yolovp
 (base) /dataset01/zwc/tensorrtx/yolop/build (master ✘)✹✭ ᐅ ./yolop -d yolop.trt /dataset01/zwc/tensorrtx/yolop/YOLOP/inference/images
 140ms
@@ -85,7 +87,74 @@ tensorrt8比较多的话，就都用8,不然都不像是2024年的论文。
 inference time: 122ms
 inference time: 0ms
 
+
 现在的问题，yolov5s，部署到tensorrt上后，怎么生成result.json文件呢？
+OK，现在的目标，在cpp文件中，先加上输出一行result的功能。然后慢慢变成整个json文件，最后再通过json文件调用cocoapi评估。
+
+yolov5自己保存的json的内容是这样的
+  {
+    "image_id": 298251,
+    "category_id": 24,
+    "bbox": [
+      182.879,
+      83.94,
+      7.647,
+      10.981
+    ],
+    "score": 0.00101
+  },
+  {
+    "image_id": 298251,
+    "category_id": 20,
+    "bbox": [
+      558.804,
+      60.177,
+      23.797,
+      42.772
+    ],
+    "score": 0.001
+  },
+
+tensorrt的engine可以打印的内容如下。
+(base) /dataset01/zwc/tensorrtx/yolov5/tensorrtx/yolov5/build (yolov5-v7.0 ✘)✹ ᐅ ./yolov5_det -d yolov5s.engine ../images
+
+Processing file: zidane.jpg
+inference time: 71ms
+Batch 0 detections:
+Detection: BBox [center_x: 470.939, center_y: 331.181, width: 199.023, height: 334.007], Confidence: 0.88152, Class ID: 0, Mask: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Detection: BBox [center_x: 209.099, center_y: 366.738, width: 293.279, height: 260.103], Confidence: 0.640271, Class ID: 0, Mask: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Detection: BBox [center_x: 234.697, center_y: 426.752, width: 27.3332, height: 136.118], Confidence: 0.683001, Class ID: 27, Mask: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Processing file: bus.jpg
+inference time: 0ms
+Batch 0 detections:
+Detection: BBox [center_x: 516.744, center_y: 374.972, width: 87.3314, height: 291.833], Confidence: 0.837694, Class ID: 0, Mask: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Detection: BBox [center_x: 247.782, center_y: 379.712, width: 73.7955, height: 276.479], Confidence: 0.832492, Class ID: 0, Mask: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Detection: BBox [center_x: 160.387, center_y: 389.702, width: 92.148, height: 308.945], Confidence: 0.783951, Class ID: 0, Mask: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Detection: BBox [center_x: 320.931, center_y: 298.179, width: 464.298, height: 336.266], Confidence: 0.779533, Class ID: 5, Mask: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+
+
+现在的问题是：把tensorrt的输出结果中的image_id变成：去掉.jpg和前面的0
+
+然后注释掉画出图片，找10张数字图片，把他们生成json文件，然后想办法用val.py的代码，cocoapi评估一下。
+
+1. yolov5
+image_id: 298251,我认为就是文件名去掉.jpg和前面的0
+category_id: 24,我认为就是类别id
+bbox: [182.879, 83.94, 7.647, 10.981]
+score: 0.00101，我认为就是置信度
+
+2. tensorrt
+struct alignas(float) Detection {
+  float bbox[4];  // center_x center_y w h
+  float conf;  // bbox_conf * cls_conf
+  float class_id;
+  float mask[32];
+};
+这个有定义，所以解释地比较清楚。但我不知道mask是什么意思。
+
+
+还有就是退化到fp32，是怎么操作的？
+群里有人说精度只和预处理有关系，真的吗？为什么？
 
 mAPval values are for single-model single-scale on COCO val2017 dataset.
 #### yolov5s
